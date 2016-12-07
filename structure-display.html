@@ -1,0 +1,55 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+<link rel="import" href="../iron-image/iron-image.html"><!--
+`structure-display`
+Search and Display structures from UnicarbKB by composition
+
+@demo demo/index.html 
+-->
+
+<dom-module id="structure-display">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <iron-ajax
+            auto
+            url="http://glycoproteome.expasy.org/glycoUtils/utils/unicarbKB/searchComposition/{{composition}}"
+            handle-as="json"
+            method="GET"
+            last-response="{{ajaxResponse}}"
+            on-error="_handleError"
+            debounce-duration="300">
+    </iron-ajax>
+
+    <div>
+      <template is="dom-repeat" items="[[ajaxResponse]]">
+        <a href="http://www.unicarbkb.org/structure/[[item.unicarbKBId]]">
+          <iron-image style="width:300px; height:200px;" sizing="contain"  src="data:image/png;base64,[[item.unicarbKBImage]]"></iron-image>
+        </a>
+      </template>
+    </div>
+
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'structure-display',
+
+      properties: {
+        composition: {
+          type: String,
+          reflectToAttribute: true
+        }
+      },
+
+      _handleError: function(){
+        //output a message!
+      }
+    });
+  </script>
+</dom-module>
