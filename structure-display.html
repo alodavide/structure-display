@@ -17,7 +17,7 @@ Search and Display structures from UnicarbKB by composition
 
     <iron-ajax
             auto
-            url="http://glycoproteome.expasy.org/glycoUtils/utils/unicarbKB/searchComposition/{{composition}}"
+            url="http://glycoproteome.expasy.org/glycoUtils/utils/unicarbKB/searchComposition/{{selectedStructure}}"
             handle-as="json"
             method="GET"
             last-response="{{ajaxResponse}}"
@@ -41,7 +41,7 @@ Search and Display structures from UnicarbKB by composition
       is: 'structure-display',
 
       properties: {
-        composition: {
+        selectedStructure: {
           type: String,
           reflectToAttribute: true
         }
