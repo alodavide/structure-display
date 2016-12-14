@@ -26,6 +26,9 @@ Search and Display structures from UnicarbKB by composition
     </iron-ajax>
 
     <div>
+      <template is="dom-if" if="{{_countStructures(ajaxResponse)}}">
+        <p>No structure has been found with this composition.</p>
+      </template>
       <template is="dom-repeat" items="[[ajaxResponse]]">
         <a href="http://www.unicarbkb.org/structure/[[item.unicarbKBId]]">
           <iron-image style="width:300px; height:200px;" sizing="contain"  src="data:image/png;base64,[[item.unicarbKBImage]]"></iron-image>
@@ -53,6 +56,13 @@ Search and Display structures from UnicarbKB by composition
         //popup is needed.
       },
 
+      _countStructures: function(json){
+        console.log(json);
+        if(json.length > 0){
+          return false;
+        }
+        return true;
+      },
       _selectedStructureChanged: function(newValue){
         if(newValue != '' && newValue){
           this.$.structureRequest.generateRequest();
