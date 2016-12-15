@@ -30,7 +30,7 @@ Search and Display structures from UnicarbKB by composition
         <p>No structure has been found with this composition.</p>
       </template>
       <template is="dom-repeat" items="[[ajaxResponse]]">
-        <a href="http://www.unicarbkb.org/structure/[[item.unicarbKBId]]">
+        <a href="http://www.unicarbkb.org/structure/[[item.unicarbKBId]]" target="_blank">
           <iron-image style="width:300px; height:200px;" sizing="contain"  src="data:image/png;base64,[[item.unicarbKBImage]]"></iron-image>
         </a>
       </template>
@@ -57,7 +57,7 @@ Search and Display structures from UnicarbKB by composition
       },
 
       _countStructures: function(json){
-        console.log(json);
+
         if(json.length > 0){
           return false;
         }
