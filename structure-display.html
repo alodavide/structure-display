@@ -24,8 +24,10 @@ Search and Display structures from UnicarbKB by composition
             on-error="_handleError"
             debounce-duration="300">
     </iron-ajax>
-
     <div>
+      <template is="dom-if" if="{{introMessage}}">
+        <p>Click on the nodes in the Visualizer to get structures with a particular composition.</p>
+      </template>
       <template is="dom-if" if="{{_countStructures(ajaxResponse)}}">
         <p>No structure has been found with this composition.</p>
       </template>
@@ -40,14 +42,16 @@ Search and Display structures from UnicarbKB by composition
 
   <script>
     Polymer({
-
       is: 'structure-display',
-
       properties: {
         selectedStructure: {
           type: String,
           reflectToAttribute: true,
           observer: '_selectedStructureChanged'
+        },
+        introMessage : {
+          type: Boolean,
+          value: true
         }
       },
 
@@ -56,14 +60,11 @@ Search and Display structures from UnicarbKB by composition
         //popup is needed.
       },
 
-      _countStructures: function(json){
-
-        if(json.length > 0){
-          return false;
-        }
-        return true;
+      _countStructures: function(response){
+        return response.length <= 0;
       },
       _selectedStructureChanged: function(newValue){
+        this.introMessage = false;
         if(newValue != '' && newValue){
           this.$.structureRequest.generateRequest();
         }
