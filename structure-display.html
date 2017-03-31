@@ -1,6 +1,12 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-ajax/iron-ajax.html">
-<link rel="import" href="../iron-image/iron-image.html"><!--
+<link rel="import" href="../iron-image/iron-image.html">
+<link rel="import" href="../paper-toast/paper-toast.html">
+<link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../paper-listbox/paper-listbox.html">
+<link rel="import" href="../paper-item/paper-item.html">
+
+<!--
 `structure-display`
 Search and Display structures from UnicarbKB by composition
 
@@ -17,31 +23,89 @@ Search and Display structures from UnicarbKB by composition
       a {
         color: white;
       }
+
+      paper-toast {
+        font-weight: bold;
+        width: 300px;
+        margin-left: calc(98vw - 300px);
+      }
+
+      .dropdown-padding{
+        padding-right: 30px;
+      }
     </style>
 
     <iron-ajax
             id="structureRequest"
-            url="http://glycoproteome.expasy.org/glycoUtils/utils/unicarbKB/searchComposition/{{selectedStructure}}"
             handle-as="json"
             method="GET"
             last-response="{{ajaxResponse}}"
-            on-error="_handleError"
-            debounce-duration="300">
+            on-response="_handleResponse"
+            on-error="_handleError">
     </iron-ajax>
+
+    <iron-ajax
+            id="sysRequest"
+            url="http://mendel.isb-sib.ch:8083/api/systems"
+            handle-as="json"
+            method="GET"
+            last-response="{{systemType}}"
+            on-error="_handleError">
+    </iron-ajax>
+    <iron-ajax
+            id="taxRequest"
+            url="http://mendel.sib.swiss:8083/api/taxonomies"
+            handle-as="json"
+            method="GET"
+            last-response="{{taxType}}"
+            on-error="_handleError">
+    </iron-ajax>
+    <div>
+      <h3>Glycan Filter</h3>
+      <paper-dropdown-menu label="Glycan Type" class="dropdown-padding" vertical-align="bottom" horizontal-align="left">
+        <paper-listbox class="dropdown-content" selected="{{typeSelected}}" attr-for-selected="name">
+          <template is="dom-repeat" items="{{glycanType.type}}">
+            <paper-item name="{{item}}">{{item}}</paper-item>
+          </template>
+        </paper-listbox>
+      </paper-dropdown-menu>
+
+      <paper-dropdown-menu label="Taxonomy" class="dropdown-padding" vertical-align="bottom" horizontal-align="left">
+        <paper-listbox class="dropdown-content" selected="{{taxSelected}}" attr-for-selected="name">
+          <paper-item name="ALL">ALL</paper-item>
+          <template is="dom-repeat" items="{{taxType}}">
+            <paper-item name="{{item.species}}">{{item.species}}</paper-item>
+          </template>
+        </paper-listbox>
+      </paper-dropdown-menu>
+
+      <paper-dropdown-menu label="System" class="dropdown-padding" vertical-align="bottom" horizontal-align="left">
+        <paper-listbox class="dropdown-content" selected="{{sysSelected}}" attr-for-selected="name">
+          <paper-item name="ALL">ALL</paper-item>
+          <template is="dom-repeat" items="{{systemType}}">
+            <paper-item name="{{item.name}}">{{item.name}}</paper-item>
+          </template>
+        </paper-listbox>
+      </paper-dropdown-menu>
+    </div>
+
     <div>
       <template is="dom-if" if="{{introMessage}}">
         <p>Click on the nodes in the Visualizer to get structures with a particular composition.</p>
+      </template>
+      <template is="dom-if" if="{{searchProgress}}">
+        <p>Search in progress...</p>
       </template>
       <template is="dom-if" if="{{_countStructures(ajaxResponse)}}">
         <p>No structure has been found with this composition.</p>
       </template>
       <template is="dom-repeat" items="[[ajaxResponse]]">
-        <a href="http://www.unicarbkb.org/structure/[[item.unicarbKBId]]" target="_blank">
-          <iron-image style="width:300px; height:200px;" sizing="contain"  src="data:image/png;base64,[[item.unicarbKBImage]]"></iron-image>
+        <a href="http://www.unicarbkb.org/structure/[[item.id]]" target="_blank">
+          <iron-image style="width:300px; height:200px;" sizing="contain"  src="http://mendel.isb-sib.ch:8083/image/cartoon/[[item.id]]?format=cfg"></iron-image>
         </a>
       </template>
     </div>
-
+    <paper-toast id="errorToast" text=""></paper-toast>
   </template>
 
   <script>
@@ -56,25 +120,76 @@ Search and Display structures from UnicarbKB by composition
         introMessage : {
           type: Boolean,
           value: true
+        },
+        searchProgress : {
+          type: Boolean,
+          value: false
+        },
+        typeSelected: {
+          type: String,
+          value:'ALL',
+          observer: "_selectedStructureChanged"
+        },
+        taxSelected: {
+          type: String,
+          value:'ALL',
+          observer: "_selectedStructureChanged"
+        },
+        sysSelected: {
+          type: String,
+          value:'ALL',
+          observer: "_selectedStructureChanged"
         }
       },
 
-      _handleError: function(){
-        //output a message!
-        //popup is needed.
+      attached: function(){
+        this.glycanType = {'type':['ALL','N-LINKED','O-LINKED','FREE']};
+        this.$.taxRequest.generateRequest();
+        this.$.sysRequest.generateRequest();
       },
 
       _countStructures: function(response){
-        return response.length <= 0;
+        if(response) {
+          return response.length <= 0;
+        }
+        return false;
       },
-      _selectedStructureChanged: function(newValue){
-        this.introMessage = false;
-        if(newValue != '' && newValue){
+
+      _selectedStructureChanged: function(){
+        this.ajaxResponse = null;
+        if(this.selectedStructure != '' && this.selectedStructure){
+          this.introMessage = false;
+          this.searchProgress = true;
+          this.$.structureRequest.url = 'http://mendel.isb-sib.ch:8083/api/structures?composition='+this.selectedStructure;
+
+          if(this.typeSelected != '' && this.typeSelected != 'ALL'){
+            this.$.structureRequest.url += '&glycanType='+this.typeSelected;
+          }
+          if(this.sysSelected != '' && this.sysSelected != 'ALL'){
+            this.$.structureRequest.url += '&system='+this.sysSelected+'&';
+          }
+          if(this.taxSelected != '' && this.taxSelected != 'ALL'){
+            this.$.structureRequest.url += '&taxonomy='+this.taxSelected;
+          }
           this.$.structureRequest.generateRequest();
         }
+      },
+
+      _handleError: function(e){
+        console.log(e);
+        this.$.errorToast.text = 'Cannot connect to the server.';
+        this.$.errorToast.open();
+      },
+
+      _reset: function () {
+        this.typeSelected = null;
+        this.taxSelected = null;
+        this.sysSelected = null;
+      },
+
+      _handleResponse: function(){
+        this.searchProgress = false;
       }
-
-
     });
   </script>
 </dom-module>
