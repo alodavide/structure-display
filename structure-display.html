@@ -1,7 +1,6 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-ajax/iron-ajax.html">
 <link rel="import" href="../iron-image/iron-image.html">
-<link rel="import" href="../paper-toast/paper-toast.html">
 <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../paper-listbox/paper-listbox.html">
 <link rel="import" href="../paper-item/paper-item.html">
@@ -9,7 +8,7 @@
 <!--
 `structure-display`
 Search and Display structures from UnicarbKB by composition
-
+Important: The component is set to work on a subfolder '/glynsight'.
 @demo demo/index.html
 -->
 
@@ -22,6 +21,10 @@ Search and Display structures from UnicarbKB by composition
 
       a {
         color: white;
+      }
+
+      h3 {
+        color: #000;
       }
 
       paper-toast {
@@ -93,6 +96,9 @@ Search and Display structures from UnicarbKB by composition
       <template is="dom-if" if="{{introMessage}}">
         <p>Click on the nodes in the Visualizer to get structures with a particular composition.</p>
       </template>
+      <template is="dom-if" if="{{connectError}}">
+        <p>Cannot connect to the server. Please use the contact form to report the problem. </p>
+      </template>
       <template is="dom-if" if="{{searchProgress}}">
         <p>Search in progress...</p>
       </template>
@@ -105,7 +111,7 @@ Search and Display structures from UnicarbKB by composition
         </a>
       </template>
     </div>
-    <paper-toast id="errorToast" text=""></paper-toast>
+
   </template>
 
   <script>
@@ -122,6 +128,10 @@ Search and Display structures from UnicarbKB by composition
           value: true
         },
         searchProgress : {
+          type: Boolean,
+          value: false
+        },
+        connectError : {
           type: Boolean,
           value: false
         },
@@ -159,6 +169,7 @@ Search and Display structures from UnicarbKB by composition
         this.ajaxResponse = null;
         if(this.selectedStructure != '' && this.selectedStructure){
           this.introMessage = false;
+          this.connectError = false;
           this.searchProgress = true;
           this.$.structureRequest.url = 'http://mendel.isb-sib.ch:8083/api/structures?composition='+this.selectedStructure;
 
@@ -175,10 +186,9 @@ Search and Display structures from UnicarbKB by composition
         }
       },
 
-      _handleError: function(e){
-        console.log(e);
-        this.$.errorToast.text = 'Cannot connect to the server.';
-        this.$.errorToast.open();
+      _handleError: function(){
+        this.searchProgress = false;
+        this.connectError = true;
       },
 
       _reset: function () {
