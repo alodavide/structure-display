@@ -1,6 +1,7 @@
-<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../polymer/polymer-element.html">
 <link rel="import" href="../iron-ajax/iron-ajax.html">
 <link rel="import" href="../iron-image/iron-image.html">
+<link rel="import" href="../neon-animation/web-animations.html">
 <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../paper-listbox/paper-listbox.html">
 <link rel="import" href="../paper-item/paper-item.html">
@@ -25,12 +26,6 @@ Important: The component is set to work on a subfolder '/glynsight'.
 
       h3 {
         color: #000;
-      }
-
-      paper-toast {
-        font-weight: bold;
-        width: 300px;
-        margin-left: calc(98vw - 300px);
       }
 
       .dropdown-padding{
@@ -66,7 +61,7 @@ Important: The component is set to work on a subfolder '/glynsight'.
     <div>
       <h3>Glycan Filter</h3>
       <paper-dropdown-menu label="Glycan Type" class="dropdown-padding" vertical-align="bottom" horizontal-align="left">
-        <paper-listbox class="dropdown-content" selected="{{typeSelected}}" attr-for-selected="name">
+        <paper-listbox slot="dropdown-content" class="dropdown-content" selected="{{typeSelected}}" attr-for-selected="name">
           <template is="dom-repeat" items="{{glycanType.type}}">
             <paper-item name="{{item}}">{{item}}</paper-item>
           </template>
@@ -74,7 +69,7 @@ Important: The component is set to work on a subfolder '/glynsight'.
       </paper-dropdown-menu>
 
       <paper-dropdown-menu label="Taxonomy" class="dropdown-padding" vertical-align="bottom" horizontal-align="left">
-        <paper-listbox class="dropdown-content" selected="{{taxSelected}}" attr-for-selected="name">
+        <paper-listbox slot="dropdown-content" class="dropdown-content" selected="{{taxSelected}}" attr-for-selected="name">
           <paper-item name="ALL">ALL</paper-item>
           <template is="dom-repeat" items="{{taxType}}">
             <paper-item name="{{item.species}}">{{item.species}}</paper-item>
@@ -83,7 +78,7 @@ Important: The component is set to work on a subfolder '/glynsight'.
       </paper-dropdown-menu>
 
       <paper-dropdown-menu label="System" class="dropdown-padding" vertical-align="bottom" horizontal-align="left">
-        <paper-listbox class="dropdown-content" selected="{{sysSelected}}" attr-for-selected="name">
+        <paper-listbox slot="dropdown-content" class="dropdown-content" selected="{{sysSelected}}" attr-for-selected="name">
           <paper-item name="ALL">ALL</paper-item>
           <template is="dom-repeat" items="{{systemType}}">
             <paper-item name="{{item.name}}">{{item.name}}</paper-item>
@@ -115,57 +110,62 @@ Important: The component is set to work on a subfolder '/glynsight'.
   </template>
 
   <script>
-    Polymer({
-      is: 'structure-display',
-      properties: {
-        selectedStructure: {
-          type: String,
-          reflectToAttribute: true,
-          observer: '_selectedStructureChanged'
-        },
-        introMessage : {
-          type: Boolean,
-          value: true
-        },
-        searchProgress : {
-          type: Boolean,
-          value: false
-        },
-        connectError : {
-          type: Boolean,
-          value: false
-        },
-        typeSelected: {
-          type: String,
-          value:'ALL',
-          observer: "_selectedStructureChanged"
-        },
-        taxSelected: {
-          type: String,
-          value:'ALL',
-          observer: "_selectedStructureChanged"
-        },
-        sysSelected: {
-          type: String,
-          value:'ALL',
-          observer: "_selectedStructureChanged"
-        }
-      },
+    /** @polymerElement */
+    class StructureDisplay extends Polymer.Element {
+      static get is() { return 'structure-display'; }
+      static get properties() {
+        return {
+          selectedStructure: {
+            type: String,
+            reflectToAttribute: true,
+            observer: '_selectedStructureChanged'
+          },
+          introMessage : {
+            type: Boolean,
+            value: true
+          },
+          searchProgress : {
+            type: Boolean,
+            value: false
+          },
+          connectError : {
+            type: Boolean,
+            value: false
+          },
+          typeSelected: {
+            type: String,
+            value:'ALL',
+            observer: "_selectedStructureChanged"
+          },
+          taxSelected: {
+            type: String,
+            value:'ALL',
+            observer: "_selectedStructureChanged"
+          },
+          sysSelected: {
+            type: String,
+            value:'ALL',
+            observer: "_selectedStructureChanged"
+          }
+        };
+      }
 
-      attached: function(){
+
+      connectedCallback(){
+        super.connectedCallback();
         this.glycanType = {'type':['ALL','N-LINKED','O-LINKED','FREE']};
         this.$.taxRequest.generateRequest();
         this.$.sysRequest.generateRequest();
-      },
+      }
 
-      _countStructures: function(response){
+      _countStructures (response){
         if(response) {
           return response.length <= 0;
         }
         return false;
-      },
+      }
 
-      _selectedStructureChanged: function(){
+      _selectedStructureChanged (){
         this.ajaxResponse = null;
         if(this.selectedStructure != '' && this.selectedStructure){
           this.introMessage = false;
@@ -184,22 +184,25 @@ Important: The component is set to work on a subfolder '/glynsight'.
           }
           this.$.structureRequest.generateRequest();
         }
-      },
+      }
 
-      _handleError: function(){
+      _handleError (){
         this.searchProgress = false;
         this.connectError = true;
-      },
+      }
 
-      _reset: function () {
+      _reset () {
         this.typeSelected = null;
         this.taxSelected = null;
         this.sysSelected = null;
-      },
+      }
 
-      _handleResponse: function(){
+      _handleResponse (){
         this.searchProgress = false;
       }
-    });
+    }
+
+    window.customElements.define(StructureDisplay.is, StructureDisplay);
+
   </script>
 </dom-module>
