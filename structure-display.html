@@ -5,11 +5,13 @@
 <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../paper-listbox/paper-listbox.html">
 <link rel="import" href="../paper-item/paper-item.html">
-
+<link rel="import" href="../paper-button/paper-button.html">
 <!--
 `structure-display`
 Search and Display structures from UnicarbKB by composition
-Important: The component is set to work on a subfolder '/glynsight'.
+
+IMPORTANT!!!! ADD paper button to bower.json
+
 @demo demo/index.html
 -->
 
@@ -30,6 +32,11 @@ Important: The component is set to work on a subfolder '/glynsight'.
 
       .dropdown-padding{
         padding-right: 30px;
+      }
+
+      paper-button.red {
+        background-color: #eb2011;
+        color: white;
       }
     </style>
 
@@ -85,6 +92,9 @@ Important: The component is set to work on a subfolder '/glynsight'.
           </template>
         </paper-listbox>
       </paper-dropdown-menu>
+      <template is="dom-if" if="{{showExtraction}}">
+        <paper-button raised class="red">Send to Epitope Extractor</paper-button>
+      </template>
     </div>
 
     <div>
@@ -149,6 +159,11 @@ Important: The component is set to work on a subfolder '/glynsight'.
             value: 'ALL',
             reflectToAttribute: true,
             observer: "_selectedStructureChanged"
+          },
+          showExtraction: {
+            type: Boolean,
+            value: false,
+            reflectToAttribute: true
           }
         };
       }
