@@ -93,7 +93,7 @@ IMPORTANT!!!! ADD paper button to bower.json
         </paper-listbox>
       </paper-dropdown-menu>
       <template is="dom-if" if="{{showExtraction}}">
-        <paper-button raised class="red">Send to Epitope Extractor</paper-button>
+        <paper-button on-click="_sendToEpitopeExtractor" raised class="red">Send to Epitope Extractor</paper-button>
       </template>
     </div>
 
@@ -217,6 +217,16 @@ IMPORTANT!!!! ADD paper button to bower.json
 
       _handleResponse (){
         this.searchProgress = false;
+      }
+
+      _sendToEpitopeExtractor(){
+        var epitopeExtractorServer= 'http://glycoproteome.expasy.org/epitopextractor/tool/glyconnect?autoRun=true&structures=';
+
+        for(var i = 0; i< this.ajaxResponse.length; i++){
+          epitopeExtractorServer = epitopeExtractorServer + this.ajaxResponse[i].id+',';
+        }
+
+        window.open(epitopeExtractorServer.slice(0, -1),'_blank');
       }
     }
 
