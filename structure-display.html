@@ -220,7 +220,7 @@ IMPORTANT!!!! ADD paper button to bower.json
       }
 
       _sendToEpitopeExtractor(){
-        var epitopeExtractorServer= 'http://glycoproteome.expasy.org/epitopextractor/tool/glyconnect?autoRun=true&structures=';
+        var epitopeExtractorServer= 'http://glycoproteome.expasy.org/epextractor/tool/glyconnect?autoRun=true&structures=';
 
         for(var i = 0; i< this.ajaxResponse.length; i++){
           epitopeExtractorServer = epitopeExtractorServer + this.ajaxResponse[i].id+',';
