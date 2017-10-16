@@ -97,7 +97,7 @@ IMPORTANT!!!! ADD paper button to bower.json
       </template>
     </div>
 
-    <div>
+    <div id="struContainer">
       <template is="dom-if" if="{{introMessage}}">
         <p>Click on the nodes in the Visualizer to get structures with a particular composition.</p>
       </template>
@@ -217,6 +217,7 @@ IMPORTANT!!!! ADD paper button to bower.json
 
       _handleResponse (){
         this.searchProgress = false;
+        this.$.struContainer.scrollIntoView({block: "start", behavior: "smooth"});
       }
 
       _sendToEpitopeExtractor(){
