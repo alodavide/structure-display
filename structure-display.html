@@ -1,11 +1,14 @@
 <link rel="import" href="../polymer/polymer-element.html">
 <link rel="import" href="../iron-ajax/iron-ajax.html">
 <link rel="import" href="../iron-image/iron-image.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
 <link rel="import" href="../neon-animation/web-animations.html">
 <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../paper-listbox/paper-listbox.html">
 <link rel="import" href="../paper-item/paper-item.html">
 <link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
 <!--
 `structure-display`
 Search and Display structures from UnicarbKB by composition
@@ -17,7 +20,7 @@ IMPORTANT!!!! ADD paper button to bower.json
 
 <dom-module id="structure-display">
   <template>
-    <style>
+    <style is="custom-style" include="iron-flex iron-flex-alignment">
       :host {
         display: block;
       }
@@ -37,6 +40,10 @@ IMPORTANT!!!! ADD paper button to bower.json
       paper-button.red {
         background-color: #eb2011;
         color: white;
+      }
+
+      paper-icon-button.red {
+        color: #eb2011;
       }
     </style>
 
@@ -110,11 +117,17 @@ IMPORTANT!!!! ADD paper button to bower.json
       <template is="dom-if" if="{{_countStructures(ajaxResponse)}}">
         <p>No structure has been found with this composition.</p>
       </template>
+      <div class="layout horizontal wrap">
       <template is="dom-repeat" items="[[ajaxResponse]]">
-        <a href="http://www.unicarbkb.org/structure/[[item.id]]" target="_blank">
-          <iron-image style="width:300px; height:200px;" sizing="contain"  src="http://mendel.isb-sib.ch:8083/image/cartoon/[[item.id]]?format=cfg"></iron-image>
-        </a>
+        <div class="layout horizontal">
+
+          <a href="http://www.unicarbkb.org/structure/[[item.id]]" target="_blank">
+            <iron-image style="width:300px; height:200px;" sizing="contain"  src="http://mendel.isb-sib.ch:8083/image/cartoon/[[item.id]]?format=cfg"></iron-image>
+          </a>
+          <paper-icon-button class="red" on-click="test" icon="icons:cancel"></paper-icon-button>
+        </div>
       </template>
+      </div>
     </div>
 
   </template>
@@ -181,6 +194,10 @@ IMPORTANT!!!! ADD paper button to bower.json
           return response.length <= 0;
         }
         return false;
+      }
+
+      test(e){
+        Polymer.dom(e.target.parentNode.parentNode).removeChild(e.target.parentNode);
       }
 
       _selectedStructureChanged (){
