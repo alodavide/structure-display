@@ -124,7 +124,7 @@ IMPORTANT!!!! ADD paper button to bower.json
           <a href="http://www.unicarbkb.org/structure/[[item.id]]" target="_blank">
             <iron-image style="width:300px; height:200px;" sizing="contain"  src="http://mendel.isb-sib.ch:8083/image/cartoon/[[item.id]]?format=cfg"></iron-image>
           </a>
-          <paper-icon-button class="red" on-click="test" icon="icons:cancel"></paper-icon-button>
+          <paper-icon-button class="red" on-click="removeStructure" icon="icons:cancel" index$="[[index]]"></paper-icon-button>
         </div>
       </template>
       </div>
@@ -196,8 +196,12 @@ IMPORTANT!!!! ADD paper button to bower.json
         return false;
       }
 
-      test(e){
+      removeStructure(e){
         Polymer.dom(e.target.parentNode.parentNode).removeChild(e.target.parentNode);
+        var buttonElement = Polymer.dom((e.target.parentNode)).querySelector('paper-icon-button');
+        var index = buttonElement.getAttribute('index');
+        //Trick because elements get removed, the index is not working anymore.
+        this.ajaxResponse[index].id = '';
       }
 
       _selectedStructureChanged (){
@@ -241,7 +245,10 @@ IMPORTANT!!!! ADD paper button to bower.json
         var epitopeExtractorServer= 'http://glycoproteome.expasy.org/epextractor/tool/glyconnect?autoRun=true&structures=';
 
         for(var i = 0; i< this.ajaxResponse.length; i++){
-          epitopeExtractorServer = epitopeExtractorServer + this.ajaxResponse[i].id+',';
+          //Check to remove all the empty indexes (the one that has been removed by the user).
+          if(this.ajaxResponse[i].id !== '' ){
+            epitopeExtractorServer = epitopeExtractorServer + this.ajaxResponse[i].id+',';
+          }
         }
 
         window.open(epitopeExtractorServer.slice(0, -1),'_blank');
