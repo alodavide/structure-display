@@ -73,6 +73,7 @@ IMPORTANT!!!! ADD paper button to bower.json
             on-error="_handleError">
     </iron-ajax>
     <div>
+      <h3>Selected Composition: {{_compositionToString(selectedStructure)}}</h3>
       <h3>Glycan Filter</h3>
       <paper-dropdown-menu label="Glycan Type" class="dropdown-padding" vertical-align="bottom" horizontal-align="left">
         <paper-listbox slot="dropdown-content" class="dropdown-content" selected="{{typeSelected}}" attr-for-selected="name">
@@ -118,15 +119,15 @@ IMPORTANT!!!! ADD paper button to bower.json
         <p>No structure has been found with this composition.</p>
       </template>
       <div class="layout horizontal wrap">
-      <template is="dom-repeat" items="[[ajaxResponse]]">
-        <div class="layout horizontal">
+        <template is="dom-repeat" items="[[ajaxResponse]]">
+          <div class="layout horizontal">
 
-          <a href="http://www.unicarbkb.org/structure/[[item.id]]" target="_blank">
-            <iron-image style="width:300px; height:200px;" sizing="contain"  src="http://mendel.isb-sib.ch:8083/image/cartoon/[[item.id]]?format=cfg"></iron-image>
-          </a>
-          <paper-icon-button class="red" on-click="removeStructure" icon="icons:cancel" index$="[[index]]"></paper-icon-button>
-        </div>
-      </template>
+            <a href="http://www.unicarbkb.org/structure/[[item.id]]" target="_blank">
+              <iron-image style="width:300px; height:200px;" sizing="contain"  src="http://mendel.isb-sib.ch:8083/image/cartoon/[[item.id]]?format=cfg"></iron-image>
+            </a>
+            <paper-icon-button class="red" on-click="removeStructure" icon="icons:cancel" index$="[[index]]"></paper-icon-button>
+          </div>
+        </template>
       </div>
     </div>
 
@@ -252,6 +253,41 @@ IMPORTANT!!!! ADD paper button to bower.json
         }
 
         window.open(epitopeExtractorServer.slice(0, -1),'_blank');
+      }
+
+      _compositionToString(composition) {
+        var outputString = '';
+        if (composition.charAt(0) !== "0") {
+          outputString += 'H' + composition.charAt(0);
+        }
+        if (composition.charAt(1) !== "0") {
+          outputString += 'N' + composition.charAt(1);
+        }
+        if (composition.charAt(2) !== "0") {
+          outputString += 'F' + composition.charAt(2);
+        }
+        if (composition.charAt(3) !== "0") {
+          outputString += 'S' + composition.charAt(3);
+        }
+        if (composition.charAt(4) !== "0") {
+          outputString += 'G' + composition.charAt(4);
+        }
+        if (composition.charAt(5) !== "0") {
+          outputString += 'P' + composition.charAt(5);
+        }
+        if (composition.charAt(6) !== "0") {
+          outputString += 's' + composition.charAt(6);
+        }
+        if (composition.charAt(7) !== "0") {
+          outputString += 'p' + composition.charAt(7)
+        }
+        if (composition.charAt(11) !== "0") {
+          outputString += 'm' + composition.charAt(11)
+        }
+        if (composition.charAt(12) !== "0") {
+          outputString += 'a' + composition.charAt(11)
+        }
+        return outputString;
       }
     }
 
