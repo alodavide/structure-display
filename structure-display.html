@@ -58,7 +58,7 @@ IMPORTANT!!!! ADD paper button to bower.json
 
     <iron-ajax
             id="sysRequest"
-            url="http://mendel.isb-sib.ch:8083/api/systems"
+            url$="[[apiServer]]/api/systems"
             handle-as="json"
             method="GET"
             last-response="{{systemType}}"
@@ -66,7 +66,7 @@ IMPORTANT!!!! ADD paper button to bower.json
     </iron-ajax>
     <iron-ajax
             id="taxRequest"
-            url="http://mendel.sib.swiss:8083/api/taxonomies"
+            url$="[[apiServer]]/api/taxonomies"
             handle-as="json"
             method="GET"
             last-response="{{taxType}}"
@@ -122,8 +122,8 @@ IMPORTANT!!!! ADD paper button to bower.json
         <template is="dom-repeat" items="[[ajaxResponse]]">
           <div class="layout horizontal">
 
-            <a href="http://www.unicarbkb.org/structure/[[item.id]]" target="_blank">
-              <iron-image style="width:300px; height:200px;" sizing="contain"  src="http://mendel.isb-sib.ch:8083/image/cartoon/[[item.id]]?format=cfg"></iron-image>
+            <a href="http://glyconnect.expasy.org/structure/[[item.id]]" target="_blank">
+              <iron-image style="width:300px; height:200px;" sizing="contain"  src$="[[apiServer]]/api/cartoon/[[item.id]]?format=cfg"></iron-image>
             </a>
             <paper-icon-button class="red" on-click="removeStructure" icon="icons:cancel" index$="[[index]]"></paper-icon-button>
           </div>
@@ -139,10 +139,13 @@ IMPORTANT!!!! ADD paper button to bower.json
       static get is() { return 'structure-display'; }
       static get properties() {
         return {
+          apiServer:{
+            type: String,
+            reflectToAttribute: true
+          },
           selectedStructure: {
             type: String,
-            reflectToAttribute: true,
-            observer: '_selectedStructureChanged'
+            reflectToAttribute: true
           },
           introMessage : {
             type: Boolean,
@@ -159,20 +162,17 @@ IMPORTANT!!!! ADD paper button to bower.json
           typeSelected: {
             type: String,
             value: 'ALL',
-            reflectToAttribute: true,
-            observer: "_selectedStructureChanged"
+            reflectToAttribute: true
           },
           taxSelected: {
             type: String,
             value: 'ALL',
-            reflectToAttribute: true,
-            observer: "_selectedStructureChanged"
+            reflectToAttribute: true
           },
           sysSelected: {
             type: String,
             value: 'ALL',
-            reflectToAttribute: true,
-            observer: "_selectedStructureChanged"
+            reflectToAttribute: true
           },
           showExtraction: {
             type: Boolean,
@@ -182,6 +182,11 @@ IMPORTANT!!!! ADD paper button to bower.json
         };
       }
 
+      static get observers() {
+        return [
+          'structureApiCall(selectedStructure,typeSelected,sysSelected,taxSelected)'
+        ]
+      }
 
       connectedCallback(){
         super.connectedCallback();
@@ -205,22 +210,23 @@ IMPORTANT!!!! ADD paper button to bower.json
         this.ajaxResponse[index].id = '';
       }
 
-      _selectedStructureChanged (){
+     structureApiCall(selectedStructure,typeSelected,sysSelected,taxSelected){
         this.ajaxResponse = null;
-        if(this.selectedStructure != '' && this.selectedStructure){
+        if(selectedStructure !== '' && selectedStructure){
           this.introMessage = false;
           this.connectError = false;
           this.searchProgress = true;
-          this.$.structureRequest.url = 'http://mendel.isb-sib.ch:8083/api/structures?composition='+this.selectedStructure;
 
-          if(this.typeSelected != '' && this.typeSelected != 'ALL'){
-            this.$.structureRequest.url += '&glycanType='+this.typeSelected;
+          this.$.structureRequest.url = this.apiServer+'/api/structures?composition='+selectedStructure;
+
+          if(typeSelected !== '' && typeSelected !== 'ALL'){
+            this.$.structureRequest.url += '&glycanType='+typeSelected;
           }
-          if(this.sysSelected != '' && this.sysSelected != 'ALL'){
-            this.$.structureRequest.url += '&system='+this.sysSelected+'&';
+          if(sysSelected !== '' && sysSelected !== 'ALL'){
+            this.$.structureRequest.url += '&system='+sysSelected+'&';
           }
-          if(this.taxSelected != '' && this.taxSelected != 'ALL'){
-            this.$.structureRequest.url += '&taxonomy='+this.taxSelected;
+          if(taxSelected !== '' && taxSelected !== 'ALL'){
+            this.$.structureRequest.url += '&taxonomy='+taxSelected;
           }
           this.$.structureRequest.generateRequest();
         }
