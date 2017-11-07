@@ -122,7 +122,7 @@ IMPORTANT!!!! ADD paper button to bower.json
         <template is="dom-repeat" items="[[ajaxResponse]]">
           <div class="layout horizontal">
 
-            <a href="http://glyconnect.expasy.org/structure/[[item.id]]" target="_blank">
+            <a href="http://glyconnect.expasy.org/glycan/[[item.id]]" target="_blank">
               <iron-image style="width:300px; height:200px;" sizing="contain"  src$="[[apiServer]]/api/cartoon/[[item.id]]?format=cfg"></iron-image>
             </a>
             <paper-icon-button class="red" on-click="removeStructure" icon="icons:cancel" index$="[[index]]"></paper-icon-button>
