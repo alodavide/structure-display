@@ -240,7 +240,9 @@ IMPORTANT!!!! ADD paper button to bower.json
       _handleError (){
         this.searchProgress = false;
         this.connectError = true;
-        this.$.struContainer.scrollIntoView({block: "start", behavior: "smooth"});
+        if(this.autoScroll) {
+          this.$.struContainer.scrollIntoView({block: "start", behavior: "smooth"});
+        }
       }
 
       _reset () {
