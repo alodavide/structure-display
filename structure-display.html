@@ -180,6 +180,11 @@ IMPORTANT!!!! ADD paper button to bower.json
             type: Boolean,
             value: false,
             reflectToAttribute: true
+          },
+          autoScroll: {
+            type: Boolean,
+            value: false,
+            reflectToAttribute: true
           }
         };
       }
@@ -246,7 +251,9 @@ IMPORTANT!!!! ADD paper button to bower.json
 
       _handleResponse (){
         this.searchProgress = false;
-        this.$.struContainer.scrollIntoView({block: "start", behavior: "smooth"});
+        if(this.autoScroll){
+          this.$.struContainer.scrollIntoView({block: "start", behavior: "smooth"});
+        }
       }
 
       _sendToEpitopeExtractor(){
